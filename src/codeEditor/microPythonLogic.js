@@ -51,8 +51,50 @@ export const useMicroPython = () => {
                 throw new Error(`Execution failed: ${error.message}`);
               }
             },
+            FS: micropython.FS,
           };
 
+          // Create /lib directory
+          try {
+            micropythonRef.current.FS.mkdir('/lib');
+          } catch (e) {
+            console.warn('Failed to create /lib directory:', e);
+          }
+
+          // Preload custom modules
+          const modules = ['hello.py', 'electrical.py'];
+          for (const mod of modules) {
+            try {
+              const response = await fetch(`/lib/${mod}`);
+              if (!response.ok) {
+                throw new Error(`Failed to fetch /lib/${mod}: ${response.statusText}`);
+              }
+              const moduleContent = await response.text();
+              console.log(`Fetched ${mod}:`, moduleContent);
+              micropythonRef.current.FS.writeFile(`/lib/${mod}`, moduleContent);
+              console.log(`Written to /lib/${mod}`);
+              // Verify file
+              const writtenContent = micropythonRef.current.FS.readFile(`/lib/${mod}`, { encoding: 'utf8' });
+              console.log(`Read /lib/${mod}:`, writtenContent);
+            } catch (moduleError) {
+              console.error(`Failed to preload ${mod}:`, moduleError);
+              setOutput(prev => `${prev}\nError: Failed to load module ${mod} - ${moduleError.message}`);
+            }
+          }
+
+          // Update sys.path
+          try {
+            await micropythonRef.current.runCode(`
+import sys
+sys.path.append('/lib')
+print("sys.path:", sys.path)  # Debug
+`);
+          } catch (pathError) {
+            console.error('Failed to update sys.path:', pathError);
+            setOutput(prev => `${prev}\nError: Failed to set sys.path - ${pathError.message}`);
+          }
+
+          // Test MicroPython
           try {
             await micropythonRef.current.runCode('print("MicroPython test successful")');
             setOutput('MicroPython initialized\nTest output: MicroPython test successful');
