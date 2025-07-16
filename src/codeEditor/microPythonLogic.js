@@ -75,15 +75,35 @@ export const useMicroPython = () => {
             FS: micropython.FS,
           };
 
-          // Create /lib directory
+          // Create directory structure
           try {
             micropythonRef.current.FS.mkdir("/lib");
+            micropythonRef.current.FS.mkdir("/lib/output_modules");
+            micropythonRef.current.FS.mkdir("/lib/process_modules");
+            micropythonRef.current.FS.mkdir("/lib/input_modules");
+            micropythonRef.current.FS.mkdir("/lib/data_modules");
           } catch (e) {
-            console.warn("Failed to create /lib directory:", e);
+            console.warn("Failed to create directories:", e);
           }
 
-          // Preload custom modules
-          const modules = ["hello.py", "electrical.py", "machine.py"];
+          // Preload modules
+          const modules = [
+            "electrical.py",
+            "hello.py",
+            "machine.py",
+            "output_modules/st7565_spi.py",
+            "process_modules/text_buffer.py",
+            "process_modules/text_buffer_uploader.py",
+            "process_modules/menu_buffer.py",
+            "process_modules/menu_buffer_uploader.py",
+            "process_modules/form_buffer.py",
+            "process_modules/form_buffer_uploader.py",
+            "process_modules/typer.py",
+            "process_modules/navbar.py",
+            "input_modules/keypad.py",
+            "data_modules/keypad_map.py",
+            "data_modules/characters.py",
+          ];
           for (const mod of modules) {
             try {
               const response = await fetch(`/lib/${mod}`);
@@ -94,7 +114,6 @@ export const useMicroPython = () => {
               }
               const moduleContent = await response.text();
               micropythonRef.current.FS.writeFile(`/lib/${mod}`, moduleContent);
-              // Verify file
               const writtenContent = micropythonRef.current.FS.readFile(
                 `/lib/${mod}`,
                 { encoding: "utf8" }
@@ -113,7 +132,13 @@ export const useMicroPython = () => {
             await micropythonRef.current.runCode(`
               import sys
               sys.path.append('/lib')
-              print("sys.path:", sys.path)  # Debug
+              sys.path.append('/lib/machine')
+              sys.path.append('/lib/output_modules')
+              sys.path.append('/lib/process_modules')
+              sys.path.append('/lib/input_modules')
+              sys.path.append('/lib/data_modules')
+              print("sys.path:", sys.path)
+              import utime
               `);
           } catch (pathError) {
             console.error("Failed to update sys.path:", pathError);

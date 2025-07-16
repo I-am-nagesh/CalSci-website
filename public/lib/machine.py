@@ -23,7 +23,6 @@ class Pin:
     def off(self):
         self.value(0)
 
-
 class SPI:
     def __init__(self, id, baudrate=1000000, polarity=0, phase=0, sck=None, mosi=None):
         self.id = id
@@ -61,4 +60,3 @@ class SPI:
             if self.mosi:
                 self.mosi.off()
             self._initialized = False
-            
