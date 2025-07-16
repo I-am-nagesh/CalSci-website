@@ -82,16 +82,60 @@ export const useMicroPython = () => {
             micropythonRef.current.FS.mkdir("/lib/process_modules");
             micropythonRef.current.FS.mkdir("/lib/input_modules");
             micropythonRef.current.FS.mkdir("/lib/data_modules");
+            micropythonRef.current.FS.mkdir("/lib/application_modules");
           } catch (e) {
             console.warn("Failed to create directories:", e);
           }
 
           // Preload modules
+          // const modules = [
+          //   "electrical.py",
+          //   "hello.py",
+          //   "machine.py",
+          //   "output_modules/st7565_spi.py",
+          //   "process_modules/text_buffer.py",
+          //   "process_modules/text_buffer_uploader.py",
+          //   "process_modules/menu_buffer.py",
+          //   "process_modules/menu_buffer_uploader.py",
+          //   "process_modules/form_buffer.py",
+          //   "process_modules/form_buffer_uploader.py",
+          //   "process_modules/typer.py",
+          //   "process_modules/navbar.py",
+          //   "input_modules/keypad.py",
+          //   "data_modules/keypad_map.py",
+          //   "data_modules/characters.py",
+          // ];
           const modules = [
+            // Top-level modules
             "electrical.py",
             "hello.py",
             "machine.py",
+
+            // application_modules
+            "application_modules/backlight.py",
+            "application_modules/calculate.py",
+            "application_modules/chatbot_ai.py",
+            "application_modules/graph.py",
+            "application_modules/home.py",
+            "application_modules/network_status.py",
+            "application_modules/settings.py",
+            "application_modules/wifi_app.py",
+            "application_modules/wifi_connector.py",
+
+            // data_modules
+            "data_modules/keypad_map.py",
+            "data_modules/characters.py",
+            "data_modules/app_handler.py",
+            "data_modules/object_handler.py",
+            "data_modules/configuration.py",
+
+            // input_modules
+            "input_modules/keypad.py",
+
+            // output_modules
             "output_modules/st7565_spi.py",
+
+            // process_modules
             "process_modules/text_buffer.py",
             "process_modules/text_buffer_uploader.py",
             "process_modules/menu_buffer.py",
@@ -100,9 +144,8 @@ export const useMicroPython = () => {
             "process_modules/form_buffer_uploader.py",
             "process_modules/typer.py",
             "process_modules/navbar.py",
-            "input_modules/keypad.py",
-            "data_modules/keypad_map.py",
-            "data_modules/characters.py",
+            "process_modules/app_switch.py",
+            "process_modules/graphics_buffer_uploader.py"
           ];
           for (const mod of modules) {
             try {
@@ -137,6 +180,7 @@ export const useMicroPython = () => {
               sys.path.append('/lib/process_modules')
               sys.path.append('/lib/input_modules')
               sys.path.append('/lib/data_modules')
+              sys.path.append('/lib/application_modules')
               print("sys.path:", sys.path)
               import utime
               `);

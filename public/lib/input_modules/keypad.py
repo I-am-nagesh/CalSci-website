@@ -1,5 +1,4 @@
-
-from machine import Pin #type: ignore
+from machine import Pin  # type: ignore
 import utime as time #type: ignore
 
 class Keypad:
