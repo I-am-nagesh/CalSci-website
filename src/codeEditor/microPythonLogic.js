@@ -83,7 +83,7 @@ export const useMicroPython = () => {
           }
 
           // Preload custom modules
-          const modules = ["hello.py", "electrical.py"];
+          const modules = ["hello.py", "electrical.py", "machine.py"];
           for (const mod of modules) {
             try {
               const response = await fetch(`/lib/${mod}`);
